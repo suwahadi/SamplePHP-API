@@ -1,18 +1,5 @@
 <?php
 
-if (isset($_POST["apiKey"]))
-{
-	$ambiltoken = $_POST['apiKey'];
-	$tokenvalid = 'fXiDF3b1b831066a40e308e0af92h'; //contoh valid api key
-}
-
-if ($ambiltoken != $tokenvalid) { //jika token salah
-    echo "api key salah!";
-    //close();
-
-}else {
-	echo "api key benar... ";
-
 interface DatabaseInterface {
 	public function getSql($name);
 	public function connect($hostname,$username,$password,$database,$port,$socket,$charset);
@@ -2256,7 +2243,6 @@ class PHP_CRUD_API {
 	}
 }
 
-
 require 'auth.php';
 $api = new PHP_CRUD_API(array(
  	'dbengine'=>'MySQL',
@@ -2265,6 +2251,25 @@ $api = new PHP_CRUD_API(array(
  	'password'=>'pass123',
  	'database'=>'db1',
  	'charset'=>'utf8'
- ));
- $api->executeCommand();
+));
+
+if  ($_SERVER["REQUEST_METHOD"] == "POST")
+{
+	$tokenvalid = 'fXiDF3b1b831066a40e308e0af92h'; //contoh valid api key
+	$ambiltoken = $_POST['apiKey'];
+	if ($ambiltoken == $tokenvalid) {
+		$api->executeCommand();
+	}else{
+		$data401 = '401 - Unauthorized (Invalid API key)';
+		header('Content-Type: application/json');
+		header('HTTP/1.1 401 Unauthorized', true, 401);
+		echo json_encode($data401);
+	}
+
+}else
+{
+	$data401 = '401 - Unauthorized (No API key provided)';
+	header('Content-Type: application/json');
+	header('HTTP/1.1 401 Unauthorized', true, 401);
+	echo json_encode($data401);
 }
